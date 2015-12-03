@@ -1,3 +1,4 @@
+require 'scraperwiki'
 require 'rubygems'
 require 'mechanize'
 require 'nokogiri'
@@ -6,8 +7,8 @@ require 'typhoeus'
 require 'date'
 require 'yaml'
 
-#ScraperWiki.sqliteexecute('CREATE TABLE `swdata` (`url` text, `uid` text, `date_scraped` text,`start_date` text)')
-#ScraperWiki.sqliteexecute('CREATE INDEX date_scraped ON swdata (date_scraped)')
+#ScraperWiki.sqliteexecute('CREATE TABLE `data` (`url` text, `uid` text, `date_scraped` text,`start_date` text)')
+#ScraperWiki.sqliteexecute('CREATE INDEX date_scraped ON data (date_scraped)')
 #exit
 
 BASE_URL = 'http://planning.hounslow.gov.uk/'
@@ -38,11 +39,11 @@ def search_for_new_applications(until_date=Date.today)
 end
 
 def update_stale_applications
-  unpopulated_applications = ScraperWiki.select("* from swdata WHERE date_scraped IS NULL LIMIT 500")
+  unpopulated_applications = ScraperWiki.select("* from data WHERE date_scraped IS NULL LIMIT 500")
   unpopulated_applications.each do |app|
     populate_application_details(app)
   end
-  current_applications = ScraperWiki.select("* from swdata WHERE start_date > '#{(Date.today-60).strftime('%F')}' ORDER BY date_scraped LIMIT 500")
+  current_applications = ScraperWiki.select("* from data WHERE start_date > '#{(Date.today-60).strftime('%F')}' ORDER BY date_scraped LIMIT 500")
   current_applications.each do |app|
     populate_application_details(app)
   end
